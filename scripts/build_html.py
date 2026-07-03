@@ -430,6 +430,8 @@ function shuffle(arr){
   return a;
 }
 function escapeHtml(s){return (s==null?"":String(s)).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+// 图片 URL：http 升级为 https，避免 HTTPS 页面下的 Mixed Content 警告
+function imgUrl(u){ return u ? String(u).replace(/^http:\/\//i, "https://") : ""; }
 
 function show(id){
   ["page-cover","page-exam","page-result"].forEach(function(p){
@@ -836,7 +838,7 @@ function renderQuestion(){
 
     var tagClass = q.type==="judge"?"judge":"";
     var tagText = q.type==="judge"?"判断题":"单选题";
-    var imgHtml = q.image ? ('<img class="q-image" src="'+q.image+'" alt="题目图" loading="lazy" onerror="this.style.display=\'none\'">') : "";
+    var imgHtml = q.image ? ('<img class="q-image" src="'+imgUrl(q.image)+'" alt="题目图" loading="lazy" onerror="this.style.display=\'none\'">') : "";
 
     // 选项渲染
     var selected = state.answers[i];
@@ -1232,7 +1234,7 @@ function renderReviewList(){
     var labelCls = isRight ? "right" : (isWrong ? "wrong" : "");
     html += '<div class="rv-head"><span class="t '+labelCls+'">'+label+'</span><span class="t">第'+(i+1)+'题 · '+(q.type==="judge"?"判断":"单选")+'</span></div>';
     html += '<div class="rv-q">'+escapeHtml(q.question);
-    if(q.image) html += '<br><img src="'+q.image+'" alt="" loading="lazy" onerror="this.style.display=\'none\'">';
+    if(q.image) html += '<br><img src="'+imgUrl(q.image)+'" alt="" loading="lazy" onerror="this.style.display=\'none\'">';
     html += '</div>';
     if(isWrong && your !== undefined){
       html += '<div class="rv-ans">你的答案：<span class="your wrong">'+escapeHtml(q.options[your])+'</span></div>';
@@ -1265,7 +1267,7 @@ $("btn-predl").onclick = function(){ openPredl(); };
 
 function openPredl(){
   var urls = [];
-  BANK.forEach(function(q){ if(q.image) urls.push(q.image); });
+  BANK.forEach(function(q){ if(q.image) urls.push(imgUrl(q.image)); });
   if(urls.length === 0){ alert("题库无图片。"); return; }
   $("dl-title").textContent = "📥 预下载图片库";
   $("dl-sub").textContent = "将下载全部 "+urls.length+" 张题目图片至本地，支持离线查看。预计约 50-100MB。";
