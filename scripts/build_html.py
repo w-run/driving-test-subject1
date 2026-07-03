@@ -36,7 +36,7 @@ TEMPLATE = r"""<!DOCTYPE html>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#1e80ff">
-<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="科目一">
 <link rel="manifest" href="manifest.json">
@@ -406,7 +406,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 
 <script>
 window.__BANK__ = __BANK_JSON__;
-window.__BUILD_VER__ = "__BUILD_VER__";
+window["__BUILD_VER__"] = "__BUILD_VER__";
 </script>
 <script>
 (function(){
@@ -1354,7 +1354,9 @@ def main():
     # 紧凑 JSON，减少体积
     bank_json = json.dumps(bank, ensure_ascii=False, separators=(",", ":"))
 
-    html = TEMPLATE.replace("__BANK_JSON__", bank_json).replace("__BUILD_VER__", BUILD_VER)
+    # 先替换版本号占位符（模板自身），再内联题库
+    # 顺序重要：避免题库文本万一含占位符串被误替换
+    html = TEMPLATE.replace("__BUILD_VER__", BUILD_VER).replace("__BANK_JSON__", bank_json)
     with open(OUT_HTML, "w", encoding="utf-8") as f:
         f.write(html)
 
